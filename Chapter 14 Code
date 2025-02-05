@@ -1,0 +1,259 @@
+// Lecture Supplementary Code prepared by Jesse Cha
+// Email: jesse@ogmacorp.com
+// Created 2024.2.4
+/*
+This is an example Bible.h file to review concepts on Classes.
+*/
+// Specification file for the Bible class.
+// Directive that checks with preprocessor if BIBLE_H has not been previously created
+#ifndef BIBLE_H 
+#define BIBLE_H 
+// Bible Class declaration
+class Bible
+{
+    private: // These are Access Specifiers
+       /*
+       Note #1: A single copy of the pages static member variable
+        is shared by all instances of the Bible class
+       Note #2: The bible class's static member function prophets 
+        is created before instances of a class like pages. 
+        This has an implication that the class's static member  
+        functions can access the static member variables before 
+        defining instances of classes!
+       */ 
+       static int prophets; // Static member variable    
+       int pages; 
+       int books; 
+       int *readcount; 
+       void createReadCount()
+       { readcount = new int; 
+         *readcount = 0; 
+       // Pointer Recap: readcount variable stores the address 
+       // While *readcount stores the actual value.
+       }
+    public: 
+       //Constructors are tools for initializing member variables
+       Bible(); 
+           {
+            createReadCount();
+            prophets++;
+            }
+       Bible(int p, int b=66) //Overloading Constructors
+            { 
+              createReadCount();
+              pages = p;
+              books = b;
+            }
+              
+       // Copy constructor
+       // Because copy constructors want to make a 
+       // copy of the argument and not modify it, you can use
+       // the const argument to keep the copy constructor's 
+       // parameters constant even with access to the argument data
+       // (Best practices)   
+       // The = operator is used to call this copy constructor and 
+       // the copy constructor's parameter must be a reference object.
+       // The purpose of the copy constructor is to INITIALIZE a NEW 
+       // object from another object. 
+       Bible(const Bible &obj)
+       { prophets = obj.prophets;
+         pages = obj.pages;
+         books = obj.books;
+         readcount = new int;              
+       }
+       // Let's see how we can MODIFY an EXISTING object by 
+       // overloading the = assignment operator.
+       // As a side note, you can overload all sorts of Operators!
+       // The only operators you can't are in brackets below:
+       // [?:] [.] [.*] [::] [sizeof]
+       const Bible operator=(const Bible &obj)
+       { 
+           if (this != &right) // Check for self assignment
+           {
+              prophets = obj.prophets;
+              pages = obj.pages;
+              books = obj.books;
+              readcount = new int;
+           }   
+       }       
+  
+       ~Bible(); //Destructor
+       void setPages(int); // public members
+       void setBooks(int);
+       void setReadCount(int);
+       int getPages() const; //const tells fcn won't change data in the obj
+       int getBooks() const //inline member function example  
+            { return books;} 
+       static void getProphets(int);
+       // The addProphet friend function is not part of the Bible   
+       // class, but it has access to the Bible class's 
+       // private member prophets.
+       // This friend function takes in an int and a 
+       // reference object of the Bible class. 
+       // Ampersand denotes that the argument is passed by reference.
+       // Recall that we pass by reference when want to avoid making 
+       // a copy of the bible object. 
+       friend void Jesus::addProphet(int, Bible &)
+       
+       // You can even make an entire class a friend
+       // In this case, we have the God class as a friend class of 
+       // the Bible class. The God class has access to all the 
+       // private members of the Bible class, but not all classes
+       // should have this access i.e. Jesus class only has the 
+       // addProphet function with access to the private member 
+       // of the Bible class.  
+       friend class God; 
+};
+int Bible::prophets = 0; 
+#endif
+
+/*
+This is an example Jesus.h file to review concepts on Classes.
+*/
+#ifndef JESUS_H
+#define JESUS_H
+class Bible; //This is called a forward declaration; 
+             //Why do we need it? (Answer below)
+
+class Jesus;
+{
+private:
+      int age; 
+public: 
+      Jesus()
+          { age = 33;} 
+      // The addProphet function has a Bible reference variable
+      // (Another reason why the forward declaration is needed.)
+      void addProphet(int, Bible &)
+};
+
+#endif
+
+/*
+This is an example God.h file to review concepts on Classes.
+*/
+#ifndef GOD_H
+#define GOD_H
+
+class God;
+{
+private:
+      int count; 
+public: 
+      God()
+          {count = 1;} 
+};
+
+#endif
+
+/*
+This is an example Bible.cpp file to review concepts on Classes.
+*/
+
+#include <iostream>
+#include <cstdlib>
+#include "God.h"
+#include "Jesus.h" //the compiler processes the jesus.h
+                   //before the bible.h file, so a forward
+                   //declaration is necessary
+#include "Bible.h" //needed for the Bible class
+using namespace std;
+
+//Default constructor initializes pages and books
+Bible::Bible()
+{
+     pages = 1000;
+     books = 66;
+}
+
+Bible:Bible(int p, int b)
+
+//setPages sets the value of the member variable pages.
+void Bible::setPages(int w)
+{
+     if (w >= 0)
+         pages = w;
+     else
+     {
+         cout << "Bible page count is defined incorrectly\n";
+         exit(EXIT_FAILURE);
+     }
+}
+void Bible::setReadCount(int r)
+{ 
+     *readcount = r; 
+}
+void Jesus::addProphets(int a, Bible &bib)
+{
+     bib.prophets += a;         
+}
+
+void Bible::setProphets(int pr)
+{
+     prophets = pr;
+}
+
+int main()
+{
+     // We can set the number of prophets before defining an
+     // instance of the Bible class
+     // Note that the syntax used when we set the prophet number 
+     // is different from the syntax used when setting the pages 
+     // for the nasb object!
+     int numberOfProphets = 88;
+     Bible::setProphets(numberOfProphets);
+     
+     Bible nasb; //Now we define an instance of the Bible class a.k.a object
+     //Let's display the book count.
+     cout << "Bible book count: " << nasb.getBooks() << endl;
+     
+     nasb.setPages(66);
+     
+     Bible niv;
+     // ASSUMING the copy constructor is NOT defined, the default
+     // copy constructor does Memberwise Assignment and uses the =
+     // operator to assign the nasb object data to the niv object. 
+     // For the line below, the copy constructor is defined. 
+     niv = nasb; // Note that this calls the copy constructor 
+     
+
+     const int BIBLE_VERSIONS = 3;
+     Bible bversions[3] = { // We can access members of Objects in an Array
+           Bible(1000, 66), 
+           Bible(999,  66),
+           Bible(1111, 66)  
+     }
+     cout << "The first bible version has " << bversions[0].getPages() << " pages." << endl;
+     // Hint: We only used the ++operator when the default instance of the bible was called, and we only called it once. 
+     cout << "We have " << nasb.prophets() << " prophets in our program!\n";
+     
+     Bible esv; 
+     esv.setReadCount(4);
+     // Used COPY CONSTRUCTOR to INITIALIZE the NEW kvj object
+     Bible kvj = esv; 
+     kvj.setReadCount(1);
+     // Used OPERATOR OVERLOADING to MODIFY the EXISTING esv object
+     kvj.operator=(esv); 
+     kvj = esv; // Same as above line
+     // If you assign kvj = esv, without the copy constructor, two  
+     // pointers will point to the 
+     // same array causing changes to show up on both objects. 
+     // To resolve this issue, you can use a copy constructor. 
+     // A copy constructor has a reference parameter of the 
+     // same class type as its own object.
+     return 0;   
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,106 @@
+/*
+This is an example Bible.h file to review concepts on Classes.
+*/
+// Specification file for the Bible class.
+// Directive that checks with preprocessor if BIBLE_H has not been previously created
+#ifndef BIBLE_H 
+#define BIBLE_H 
+// Bible Class declaration
+class Bible
+{
+    private: // These are Access Specifiers
+       int pages; // private members 
+       int books; 
+    public: 
+       Bible(); //Constructors are tools for initializing member variables
+       Bible(int p, int b=66) //Overloading Constructors
+            { pages = p;
+              books = b; }
+       ~Bible(); //Destructor
+       void setPages(int); // public members
+       void setBooks(int);
+       int getPages() const; //const tells fcn won't change data in the obj
+       int getBooks() const //inline member function example  
+            { return books;} 
+      
+};
+
+#endif
+
+/*
+This is an example Bible.cpp file to review concepts on Classes.
+*/
+
+#include <iostream>
+#include <cstdlib>
+#include "Bible.h" //needed for the Bible class
+using namespace std;
+
+//Default constructor initializes pages and books
+Bible::Bible()
+{
+     pages = 1000;
+     books = 66;
+}
+
+Bible:Bible(int p, int b)
+
+//setPages sets the balue of the member variable pages.
+void Bible::setPages(double w)
+{
+     if (w >= 0)
+         pages = w;
+     else
+     {
+         cout << "Bible page count is defined incorrectly\n";
+         exit(EXIT_FAILURE);
+     }
+}
+
+int main()
+{
+     Bible nasb; //Define an instance of the Bible class a.k.a object
+     //Let's display the book count.
+     cout << "Bible book count: " << nasb.getBooks() << endl;
+     
+     const int BIBLE_VERSIONS = 3;
+     Bible bversions[3] = { // We can access members of Objects in an Array
+           Bible(1000, 66), 
+           Bible(999,  66),
+           Bible(1111, 66)  
+     }
+     cout << "The first bible version has " << bversions[0].getPages() << " pages." << endl;
+     return 0;
+     
+}
+
+/*
+This is an example UML diagram to review concepts on Classes.
+*/
+---------------------------------------------
+|                 Bible                     |   
+---------------------------------------------
+|          - pages : int                    |
+|          - books : int                    |
+---------------------------------------------
+|          + Bible() :                      |
+|          + Bible(p : int, b : int) :      |  
+|          + setPages() : void              |
+|          + setBooks() : void              |   
+|          + getPages() : int               |
+|          + getBooks() : int               |  
+---------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
